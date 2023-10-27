@@ -249,10 +249,10 @@ classdef Material
                 % 
                 % Updated  
                 F(1:2,1:2)=(eye(2)+ ht*Fpunto(1:2,1:2)) * obj(pto).ZDeformgradold(1:2,1:2);
-                obj(pto).ZDeformgradnew=F;
-                    
+                obj(pto).ZDeformgradnew=F;                
 
                 if obj(pto).type == "Linear Elastic"
+
                     % Small Strain 
                     H(1:2,1:2)=F(1:2,1:2)-eye(2);
                     Ee(1:2,1:2)=0.5*(H(1:2,1:2)+H(1:2,1:2)');
@@ -261,7 +261,7 @@ classdef Material
                     Eeo=obj(pto).ZEpsilonOld;
 
                     dEe=Ee - Eeo;
-                    obj(pto).area=obj(pto).area*(1+trace(dEe));
+                    %obj(pto).area=obj(pto).area*(1+trace(dEe));
 
                 else
                 
