@@ -297,7 +297,12 @@ function [coordenadas,conectividad,DATA,MP,NODE_LIST]=read_mpm(filename)
                 MP(p).coords=coordptog(:,p);
                 MP(p).area=Area(e)/pgausselem;
                 if nnodeselem==4
-                    MP(p).spacing = sqrt(MP(p).area);
+                    if pgausselem==9
+                        aux=4;
+                    elseif pgausselem==3
+                        aux=3;
+                    end
+                    MP(p).spacing = aux*sqrt(MP(p).area);
                 else
                     disp('elemento no identificado')
                     stop
