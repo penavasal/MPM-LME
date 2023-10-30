@@ -5,7 +5,6 @@ classdef Material
         E
         rhos
         nu
-        gravitymodulus
 
         area
         ZCauchyold=[0,0,0;0,0,0;0,0,0];
@@ -39,7 +38,6 @@ classdef Material
                      obj(i).area=MP(i).area;
                      mat=MP(i).mat;
                      obj(i).type=const(mat).type;
-                     obj(i).gravitymodulus=const(mat).gravitymodulus;
                      obj(i).rhos=const(mat).rhos;
 
                      if const(mat).type=="Linear Elastic" || const(mat).type=="Neo-Hookean"
