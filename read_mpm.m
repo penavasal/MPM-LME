@@ -299,7 +299,7 @@ function [coordenadas,conectividad,DATA,MP,NODE_LIST]=read_mpm(filename)
                 if nnodeselem==4
                     if pgausselem==9
                         aux=4;
-                    elseif pgausselem==3
+                    elseif pgausselem==4
                         aux=3;
                     end
                     MP(p).spacing = aux*sqrt(MP(p).area);

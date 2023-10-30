@@ -23,7 +23,8 @@ function [Shape,DShape,MP,nearpoint]=ShapeandGradShapeLME(coordenadas,MP,DATA,Up
    TOL=LME.TOL;
 
 
-   Nap=zeros(Np,1);
+   [Nap, node_spacing,Beta,range_lme]=deal(zeros(Np,1));
+
    for i=1:Np
 
         node_spacing(i)=MP(i).spacing;% measure of the nodal spacing

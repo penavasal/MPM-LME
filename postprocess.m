@@ -55,8 +55,8 @@ function postprocess(str2)
     %hold on
     %plot(tiempo,desp(:,IDu(2,conectividad(4,1))))
     %Zupnew(:,(1:pgausselem)+(i-1)*pgausselem)
-    plot(tiempo,vp(1+((1:length(tiempo))-1)*2, 1),'r')
-    %plot(tiempo,up(2+((1:length(tiempo))-1)*2, 363),'r')
+    %plot(tiempo,vp(1+((1:length(tiempo))-1)*2, 1),'r')
+    plot(tiempo,up(2+((1:length(tiempo))-1)*2, 363),'r')
     %hold off
     %min(desp(:,IDu(2,1)))
     

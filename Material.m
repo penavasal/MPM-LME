@@ -42,7 +42,7 @@ classdef Material
                      obj(i).gravitymodulus=const(mat).gravitymodulus;
                      obj(i).rhos=const(mat).rhos;
 
-                     if const(mat).type=="Linear Elastic"
+                     if const(mat).type=="Linear Elastic" || const(mat).type=="Neo-Hookean"
                          obj(i).E=const(mat).E;
                          obj(i).nu=const(mat).nu;
                      end
@@ -80,8 +80,9 @@ classdef Material
                 lennodes=size(nearpoint{a},2);
                 if lennodes
                     for i=1:lennodes
-                        pto=nearpoint{a}(i);        
-                        nodalinternalf(IDu(1:2,a),1) = nodalinternalf(IDu(1:2,a),1) - ...     %El signo - en nodalinternalf viene de la forma habitual de trabajar con el MPM.
+                        pto=nearpoint{a}(i);
+                        %El signo - en nodalinternalf viene de la forma habitual de trabajar con el MPM.
+                        nodalinternalf(IDu(1:2,a),1) = nodalinternalf(IDu(1:2,a),1) - ...     
                             mat(pto).ZCauchynew(1:2,1:2)*GradNinterpolanLME(:,a,pto)*mat(pto).area;
                             %mat(pto).ZPiola1old(1:2,1:2)*GradNinterpolanLME(:,a,pto)*mat(pto).area;
                     end   
@@ -89,26 +90,39 @@ classdef Material
             end
         end
 
-        function nodalexternalf=setExternalForces(nnodes,nearpoint,NinterpolanLME,mat,IDu,ti)
-
+        function nodalexternalf=setExternalForces(nnodes,nearpoint,NinterpolanLME,mat,IDu,t)
+            global LOAD nl g
             nodalexternalf=zeros(2*nnodes,1);
-            for a=1:nnodes
-                lennodes=size(nearpoint{a},2);
-                if lennodes
-                    for i=1:lennodes
-                        pto=nearpoint{a}(i);
-                        g=mat(pto).gravitymodulus;
-
-                        if ti<10
-                            ff=0.5*g*(1+sin(2*ti*pi/20-pi/2));
-                        else
-                            ff=g;
+            if nl>0 
+                for l=1:nl
+                    val=eval(LOAD(l).VALUE);
+                    if val~=0
+                        
+                        vec=LOAD(l).VECTOR(1:2)';
+                        for a=1:nnodes
+                            lennodes=size(nearpoint{a},2);
+                            if lennodes
+                                for i=1:lennodes
+                                    pto=nearpoint{a}(i);
+                                    if strcmp(LOAD(l).type,'GRAVITY')
+                                        nodalexternalf(IDu(1:2,a),1) = nodalexternalf(IDu(1:2,a),1)+...
+                                            NinterpolanLME(a,pto)*mat(pto).Mass*vec*val;
+                                    elseif strcmp(LOAD(l).type,'LINE_LOAD')
+                                        list=LOAD(l).NODE_LIST;
+                                        surf=0;
+                                        for j=1:size(list,1)
+                                            if list(j,1)==pto
+                                                surf=list(j,2);
+                                                break;
+                                            end
+                                        end
+                                    	nodalexternalf(IDu(1:2,a),1) = nodalexternalf(IDu(1:2,a),1)+...
+                                            NinterpolanLME(a,pto)*surf*vec*val;
+                                    end
+                                end   
+                            end
                         end
-       
-                        nodalexternalf(IDu(1:2,a),1) = nodalexternalf(IDu(1:2,a),1)+...
-                            NinterpolanLME(a,pto)*mat(pto).Mass*[0;-ff];
-                            %NinterpolanLME(a,pto)*mat(pto).Mass*[0;-mat(pto).gravitymodulus];
-                    end   
+                    end
                 end
             end
         end
@@ -240,7 +254,8 @@ classdef Material
                 Ee=zeros(3);
                 F=eye(3);
                 for a=1:size(MP(pto).nears,2)
-                    Fpunto(1:2,1:2)=Fpunto(1:2,1:2)+ZV(IDu(1:2,MP(pto).nears(a)),1)*GradNinterpolanLME(:,MP(pto).nears(a),pto)';
+                    Fpunto(1:2,1:2)=Fpunto(1:2,1:2)+ZV(IDu(1:2,MP(pto).nears(a)),1)...
+                        *GradNinterpolanLME(:,MP(pto).nears(a),pto)';
                 end
                             
                 % Total lagrangian
