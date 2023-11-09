@@ -93,31 +93,33 @@ classdef Material
             nodalexternalf=zeros(2*nnodes,1);
             if nl>0 
                 for l=1:nl
-                    val=eval(LOAD(l).VALUE);
-                    if val~=0
-                        
-                        vec=LOAD(l).VECTOR(1:2)';
-                        for a=1:nnodes
-                            lennodes=size(nearpoint{a},2);
-                            if lennodes
-                                for i=1:lennodes
-                                    pto=nearpoint{a}(i);
-                                    if strcmp(LOAD(l).type,'GRAVITY')
-                                        nodalexternalf(IDu(1:2,a),1) = nodalexternalf(IDu(1:2,a),1)+...
-                                            NinterpolanLME(a,pto)*mat(pto).Mass*vec*val;
-                                    elseif strcmp(LOAD(l).type,'LINE_LOAD')
-                                        list=LOAD(l).NODE_LIST;
-                                        surf=0;
-                                        for j=1:size(list,1)
-                                            if list(j,1)==pto
-                                                surf=list(j,2);
-                                                break;
+                    if t>LOAD(l).INTERVAL(1) && t<=LOAD(l).INTERVAL(2)
+                        val=eval(LOAD(l).VALUE);
+                        if val~=0
+
+                            vec=LOAD(l).VECTOR(1:2)';
+                            for a=1:nnodes
+                                lennodes=size(nearpoint{a},2);
+                                if lennodes
+                                    for i=1:lennodes
+                                        pto=nearpoint{a}(i);
+                                        if strcmp(LOAD(l).type,'GRAVITY')
+                                            nodalexternalf(IDu(1:2,a),1) = nodalexternalf(IDu(1:2,a),1)+...
+                                                NinterpolanLME(a,pto)*mat(pto).Mass*vec*val;
+                                        elseif strcmp(LOAD(l).type,'LINE_LOAD')
+                                            list=LOAD(l).NODE_LIST;
+                                            surf=0;
+                                            for j=1:size(list,1)
+                                                if list(j,1)==pto
+                                                    surf=list(j,2);
+                                                    break;
+                                                end
                                             end
+                                            nodalexternalf(IDu(1:2,a),1) = nodalexternalf(IDu(1:2,a),1)+...
+                                                NinterpolanLME(a,pto)*surf*vec*val;
                                         end
-                                    	nodalexternalf(IDu(1:2,a),1) = nodalexternalf(IDu(1:2,a),1)+...
-                                            NinterpolanLME(a,pto)*surf*vec*val;
-                                    end
-                                end   
+                                    end   
+                                end
                             end
                         end
                     end
